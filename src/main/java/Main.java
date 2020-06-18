@@ -11,22 +11,22 @@ public class Main {
 
     public static void main(String[] args) {
     	WeatherService weatherServices = new WeatherService();
-    	weatherServices.getWeatherFromCity("Stuttgart", "DE");
+    	weatherServices.getWeatherFromCity("Backnang", "DE");
     	
-    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    	Date currentDateObj = new Date();
-       	
-    	String dateString = df.format(currentDateObj);
-//    	createNewEvent("Test", "Stuttgart", "Wetterinfo", dateString);
-    	try {
-			CalendarQuickstart.updateEvent("UpdatedTest6", "Stuggi", "Wetterinfo", dateString);
-		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+//    	Date currentDateObj = new Date();
+//       	
+//    	String dateString = df.format(currentDateObj);
+////    	createNewEvent("Test", "Stuttgart", "Wetterinfo", dateString);
+//    	try {
+//			CalendarQuickstart.updateEvent("UpdatedTest6", "Stuggi", "Wetterinfo", dateString);
+//		} catch (GeneralSecurityException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
     }
     
     

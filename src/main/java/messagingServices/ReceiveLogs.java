@@ -5,6 +5,9 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
+import communication.JsonCreator;
+
+import com.google.gson.JsonObject;
 public class ReceiveLogs {
   private static final String EXCHANGE_NAME = "sensor data";
 
@@ -21,8 +24,20 @@ public class ReceiveLogs {
     System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
     DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-        String message = new String(delivery.getBody(), "UTF-8");
-        System.out.println(" [x] Received '" + message + "'");
+    	
+    	// get the message as String object
+        String messageString = new String(delivery.getBody(), "UTF-8");
+        
+        // convert the message from String to JSON object
+        JsonObject messageJson = JsonCreator.convertStringToJsonObject(messageString);
+        
+        // extract values from message
+        double temperature = JsonCreator.getSpecificDoubleAttribute(messageJson, "temperature");
+        double humidity = JsonCreator.getSpecificDoubleAttribute(messageJson, "humidity");
+        boolean rain = JsonCreator.getSpecificBooleanAttribute(messageJson, "rain");
+        
+        // print extracted values
+        System.out.println("Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain);
     };
     channel.basicConsume(queueName, true, deliverCallback, consumerTag -> { });
   }

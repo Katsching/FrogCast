@@ -2,6 +2,14 @@
 import pika
 import sys
 import json
+from gpiozero import Button
+import time
+import Adafruit_DHT
+
+rain_sensor_gpio = 1
+temperature_humidity_sensor = Adafruit_DHT.DHT22
+# DHT22 sensor connected to GPIO12.
+temperature_humidity_gpio = 12
 
 
 # builds message as a JSON object
@@ -17,18 +25,28 @@ def build_message(temperature, humidity, rain):
     return message_json
 
 
+def get_rain_sensor_data():
+    button = Button(rain_sensor_gpio)
+    if button.is_pressed:
+        return True
+    else:
+        return False
+
+
+def get_temperature_humidity_data():
+    humidity, temperature = Adafruit_DHT.read_retry(temperature_humidity_sensor, temperature_humidity_gpio)
+    return humidity, temperature
+
+
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
 
 channel.exchange_declare(exchange='sensor data', exchange_type='fanout')
 
-#message = ' '.join(sys.argv[1:]) or "info: Hello World!"
-
 # fill attributes with arbitrary testing values
-temperature = 20.2
-humidity = 50.3
-rain = False
+humidity, temperature = get_temperature_humidity_data()
+rain = get_rain_sensor_data()
 
 # build the message as JSON object
 message = build_message(temperature, humidity, rain)

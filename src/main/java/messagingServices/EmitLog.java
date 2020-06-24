@@ -9,7 +9,11 @@ public class EmitLog {
 
 	public static void main(String[] argv) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
-		factory.setHost("localhost");
+	    factory.setUsername("rasp");
+	    factory.setPassword("1234");
+	    factory.setHost("192.168.178.52");
+	    factory.setPort(5672);
+	    factory.setVirtualHost("/");
 		try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
 			channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
 
@@ -18,5 +22,9 @@ public class EmitLog {
 			channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
 			System.out.println(" [x] Sent '" + message + "'");
 		}
+	}
+	
+	private void createJsonObject() {
+		
 	}
 }

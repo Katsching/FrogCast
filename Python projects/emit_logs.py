@@ -38,9 +38,11 @@ def get_temperature_humidity_data():
     return humidity, temperature
 
 
+credentials = pika.PlainCredentials('rasp', '1234')
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+    pika.ConnectionParameters('192.168.178.30', 5672, '/', credentials))
 channel = connection.channel()
+
 
 channel.exchange_declare(exchange='sensor data', exchange_type='fanout')
 

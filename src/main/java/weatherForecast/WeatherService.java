@@ -30,13 +30,13 @@ public class WeatherService {
 				.build();
 		CurrentWeather currentWeather = client.getCurrentWeather(currentWeatherOneLocationQuery);
 		String weatherData = client.getWeatherData(currentWeatherOneLocationQuery);
-		System.out.println(weatherData);
-		System.out.println(currentWeather.getWeather());
+//		System.out.println(weatherData);
+//		System.out.println(currentWeather.getWeather());
 //     client.getForecastInformation(currentWeatherOneLocationQuery);
 
 //		System.out.println(client.getWeatherData(currentWeatherOneLocationQuery));
 //		System.out.println(currentWeather.getClouds());
-		System.out.println(prettyPrint(currentWeather));
+//		System.out.println(prettyPrint(currentWeather));
 		
 		CombinedWeatherData combinedWeatherData = new CombinedWeatherData(currentWeather.getWeather(), currentWeather);
 		return combinedWeatherData;

@@ -6,14 +6,16 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.Events;
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.EventDateTime;
 
 import java.io.FileNotFoundException;
@@ -61,15 +63,16 @@ public class CalendarQuickstart {
     }
 
     
-    public static void createNewEvent(String summary, String location, String description, String date) throws GeneralSecurityException, IOException {
+    public static void createEvent(String summary, String location, String description, String date, String eventId) throws GeneralSecurityException, IOException {
     	Calendar service = initiateTransport();
         
     	Event event = new Event()
         		    .setSummary(summary)
         		    .setLocation(location)
         		    .setDescription(description);
-         String eventID = date.replace("-", "");
-             
+//         String eventId = date.replace("-", "");
+//    	String eventID = "today";
+            
          DateTime startDateTime = new DateTime(date);
          EventDateTime allDayTime = new EventDateTime()
              .setDate(startDateTime)
@@ -77,16 +80,16 @@ public class CalendarQuickstart {
          event.setStart(allDayTime);
          event.setEnd(allDayTime);
          
-         event.setId(eventID);
+         event.setId(eventId);
 
          
          String calendarId = "primary";
-         event = service.events().insert(calendarId, event).execute();
+    	 event = service.events().insert(calendarId, event).execute();
          
          System.out.printf("Event created: %s\n", event.getHtmlLink());
     }
     
-    public static void updateEvent(String summary, String location, String description, String date) throws GeneralSecurityException, IOException {
+    public static void updateEvent(String summary, String location, String description, String date, String eventId) throws GeneralSecurityException, IOException {
          Calendar service = initiateTransport();
 
          Event updatedEvent = new Event()
@@ -102,11 +105,13 @@ public class CalendarQuickstart {
       updatedEvent.setEnd(allDayTime);
       
       String calendarId = "primary";
-      String eventId = date.replace("-", "");
+//      String eventId = date.replace("-", "");
      
-      
-      updatedEvent = service.events().update(calendarId, eventId, updatedEvent).execute();
-    	
+      try {
+    	  updatedEvent = service.events().update(calendarId, eventId, updatedEvent).execute();
+      } catch (GoogleJsonResponseException e) {
+    	  createEvent(summary, location, description, date, eventId);
+      }
     }
     
     private static Calendar initiateTransport() throws GeneralSecurityException, IOException {
@@ -119,12 +124,20 @@ public class CalendarQuickstart {
     
     
     private void createEventTitle() {
-    	// format example: Rainy - 18°C
+    	// format example: Rainy - 18ï¿½C
     }
     
     private void createWeatherDescription() {
     	//TODO
     	// example: UV value
+    }
+    
+    private boolean eventIdExists(String eventId) throws GeneralSecurityException, IOException {
+    	Calendar service = initiateTransport();
+    	
+    	Events events = service.events().list("primary").setPageToken(null).execute();
+    	List<Event> items = events.getItems();
+    	return true;
     }
     
 }

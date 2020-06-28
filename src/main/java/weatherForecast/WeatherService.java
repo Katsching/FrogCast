@@ -104,7 +104,7 @@ public class WeatherService {
 		return color;
 	}
 
-	public CalendarWeatherData createCalendarData(CurrentWeather currentWeather) {
+	public CalendarWeatherData createCalendarDataCurrent(CurrentWeather currentWeather) {
 
 		List<Weather> weatherData = currentWeather.getWeather();
 		
@@ -118,6 +118,23 @@ public class WeatherService {
 		
 		CalendarWeatherData calendarData = new CalendarWeatherData(temperature, humidity, weatherDescription);
 		return calendarData;
+	}
+	
+	public CalendarWeatherData createCalendarDataForecast(DailyForecast dailyForecast) {
+		List<Weather> weatherData = dailyForecast.getWeather();
+		Weather weatherForecast = weatherData.get(0);
+		String weatherDescription = weatherForecast.getDescription();
+		
+		
+		double temperature = dailyForecast.getTemperature().getDay();
+		double maxTemperature = dailyForecast.getTemperature().getMax();
+		double minTemperature = dailyForecast.getTemperature().getMin();
+		
+		double humidity = dailyForecast.getHumidity(); 
+		
+		CalendarWeatherData calendarData = new CalendarWeatherData(temperature, humidity, weatherDescription);
+		return calendarData;
+		
 	}
 
 }

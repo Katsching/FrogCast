@@ -20,11 +20,15 @@ import java.util.concurrent.TimeoutException;
 import java.util.spi.CalendarDataProvider;
 
 import org.openweathermap.api.model.currentweather.CurrentWeather;
+import org.openweathermap.api.model.forecast.daily.DailyForecast;
 
 import com.google.gson.JsonObject;
 public class ReceiveLogs {
   private static final String EXCHANGE_NAME = "sensor data";
-
+  private static final String LOCATION = "Backnang";
+  private static final String COUNTRYCODE = "DE";
+  
+  
   public static void main(String[] argv) throws Exception {
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost("localhost");
@@ -56,8 +60,10 @@ public class ReceiveLogs {
         System.out.println("Measured Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain);
         
         WeatherService weatherService = new WeatherService();
-        CurrentWeather combinedData = weatherService.getWeatherFromCity("Stuttgart", "DE");
-        CalendarWeatherData calendarData = weatherService.createCalendarData(combinedData);
+        CurrentWeather currentWeather = weatherService.getWeatherFromCity(LOCATION, COUNTRYCODE);
+        CalendarWeatherData calendarData = weatherService.createCalendarDataCurrent(currentWeather);
+        
+        DailyForecast dailyForecast = weatherService.getWeatherForecastFromCity(LOCATION, COUNTRYCODE);
         
         System.out.println(calendarData.getMainWeather());
         System.out.println("City temperature: " + calendarData.getTemperature());
@@ -89,6 +95,14 @@ public class ReceiveLogs {
     		 "\nRain: " + rain + 
     		 "\nCity temperature: " + calenderWeatherData.getTemperature();
   
+     
+     String prettyTomorrowsWeatherString = 
+    		 "Main Weather: " + calenderWeatherData.getMainWeather() +
+    		 "\nMeasured Temperature: " + temperature + 
+    		 "\nHumidity: " + humidity + 
+    		 "\nRain: " + rain + 
+    		 "\nCity temperature: " + calenderWeatherData.getTemperature();
+     
       // create/update calendar entries
   	try {
 			CalendarQuickstart.updateEvent(calenderWeatherData.getMainWeather(), "Stuggi", prettyTodaysWeatherString, todaysDateString, "thisistheeventidofthese24hours");

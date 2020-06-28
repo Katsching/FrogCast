@@ -5,12 +5,17 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
+import calendarFunctions.CalendarQuickstart;
 import communication.JsonCreator;
 import weatherForecast.CalendarWeatherData;
 import weatherForecast.CombinedWeatherData;
 import weatherForecast.WeatherService;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.concurrent.TimeoutException;
 import java.util.spi.CalendarDataProvider;
 
@@ -54,60 +59,57 @@ public class ReceiveLogs {
         
         System.out.println(calendarData.getMainWeather());
         System.out.println("City temperature: " + calendarData.getTemperature());
-        
-        
+
+        updateCalendar(temperature, humidity, rain, calendarData);
         
         
     };
 
     channel.basicConsume(queueName, true, deliverCallback, consumerTag -> { });
-    
+ 
+  }
+  
+  private static void updateCalendar(double temperature, double humidity, boolean rain, CalendarWeatherData calenderWeatherData) {
+  	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+  	// get today's date
+  	Calendar todaysDate = Calendar.getInstance();
+      String todaysDateString = df.format(todaysDate.getTime());
+  	
+  	// get tomorrow's date
+  	Calendar tomorrowsDate = Calendar.getInstance();
+      tomorrowsDate.add(Calendar.DAY_OF_MONTH, 1);
+      String tomorrowsDateString = df.format(tomorrowsDate.getTime());
+      
+     String prettyTodaysWeatherString = 
+    		 "Main Weather: " + calenderWeatherData.getMainWeather() +
+    		 "\nMeasured Temperature: " + temperature + 
+    		 "\nHumidity: " + humidity + 
+    		 "\nRain: " + rain + 
+    		 "\nCity temperature: " + calenderWeatherData.getTemperature();
+  
+      // create/update calendar entries
+  	try {
+			CalendarQuickstart.updateEvent(calenderWeatherData.getMainWeather(), "Stuggi", prettyTodaysWeatherString, todaysDateString, "thisistheeventidofthese24hours");
+		} catch (GeneralSecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  	
+  	try {
+			CalendarQuickstart.updateEvent("Updated Tomorrow", "Stuggi", "Wetterinfo", tomorrowsDateString, "thisistheeventidofthecoming24hours");
+		} catch (GeneralSecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
   }
   
   
-  
-  public ConnectionHelper openConnection() throws IOException, TimeoutException {
-	  ConnectionFactory factory = new ConnectionFactory();
-	    factory.setHost("localhost");
-	    Connection connection = factory.newConnection();
-	    Channel channel = connection.createChannel();
+      
 
-	    channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
-	    String queueName = channel.queueDeclare().getQueue();
-	    channel.queueBind(queueName, EXCHANGE_NAME, "");
-	    
-	    
-	    ConnectionHelper connectionHelper = new ConnectionHelper();
-	    connectionHelper.setChannel(channel);
-	    connectionHelper.setQueueName(queueName);
-	    return connectionHelper;
-  }
-  
-  public SensorWeatherData getWeatherDataFromChannel(ConnectionHelper connectionHelper) throws IOException {
-	  SensorWeatherData sensorWeatherData = new SensorWeatherData();
-	  
-	  DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-	    	
-	    	// get the message as String object
-	        String messageString = new String(delivery.getBody(), "UTF-8");
-	        
-	        // convert the message from String to JSON object
-	        JsonObject messageJson = JsonCreator.convertStringToJsonObject(messageString);
-	        
-	        // extract values from message
-	        double temperature = JsonCreator.getSpecificDoubleAttribute(messageJson, "temperature");
-	        double humidity = JsonCreator.getSpecificDoubleAttribute(messageJson, "humidity");
-	        boolean rain = JsonCreator.getSpecificBooleanAttribute(messageJson, "rain");
-	        
-	        sensorWeatherData.setTemperature(temperature);
-	        sensorWeatherData.setHumidity(humidity);
-	        sensorWeatherData.setRain(rain);
-	        
-	        // print extracted values
-	        System.out.println("Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain);
-	    };
-	    connectionHelper.getChannel().basicConsume(connectionHelper.getQueueName(), true, deliverCallback, consumerTag -> { });
-	    
-	    return sensorWeatherData;    
-  }
 }

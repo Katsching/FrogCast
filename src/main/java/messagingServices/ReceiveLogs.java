@@ -23,89 +23,87 @@ import org.openweathermap.api.model.currentweather.CurrentWeather;
 import org.openweathermap.api.model.forecast.daily.DailyForecast;
 
 import com.google.gson.JsonObject;
+
 public class ReceiveLogs {
-  private static final String EXCHANGE_NAME = "sensor data";
-  private static final String LOCATION = "Backnang";
-  private static final String COUNTRYCODE = "DE";
-  
-  
-  public static void main(String[] argv) throws Exception {
-    ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost("localhost");
-    Connection connection = factory.newConnection();
-    Channel channel = connection.createChannel();
+	private static final String EXCHANGE_NAME = "sensor data";
+	private static final String LOCATION = "Backnang";
+	private static final String COUNTRYCODE = "DE";
 
+	public static void main(String[] argv) throws Exception {
+		ConnectionFactory factory = new ConnectionFactory();
+		factory.setHost("localhost");
+		Connection connection = factory.newConnection();
+		Channel channel = connection.createChannel();
 
+		channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+		String queueName = channel.queueDeclare().getQueue();
+		channel.queueBind(queueName, EXCHANGE_NAME, "");
 
-    channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
-    String queueName = channel.queueDeclare().getQueue();
-    channel.queueBind(queueName, EXCHANGE_NAME, "");
+		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
-    System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-    
-    DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-    	
-    	// get the message as String object
-        String messageString = new String(delivery.getBody(), "UTF-8");
-        
-        // convert the message from String to JSON object
-        JsonObject messageJson = JsonCreator.convertStringToJsonObject(messageString);
-        
-        // extract values from message
-        double temperature = JsonCreator.getSpecificDoubleAttribute(messageJson, "temperature");
-        double humidity = JsonCreator.getSpecificDoubleAttribute(messageJson, "humidity");
-        boolean rain = JsonCreator.getSpecificBooleanAttribute(messageJson, "rain");
-        
-        // print extracted values
-        System.out.println("Measured Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain);
-        
-        WeatherService weatherService = new WeatherService();
-        CurrentWeather currentWeather = weatherService.getWeatherFromCity(LOCATION, COUNTRYCODE);
-        CalendarWeatherData calendarData = weatherService.createCalendarDataCurrent(currentWeather);
-        
-        DailyForecast dailyForecast = weatherService.getWeatherForecastFromCity(LOCATION, COUNTRYCODE);
-        
-        System.out.println(calendarData.getMainWeather());
-        System.out.println("City temperature: " + calendarData.getTemperature());
+		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
-        updateCalendar(temperature, humidity, rain, calendarData);
-        
-        
-    };
+			// get the message as String object
+			String messageString = new String(delivery.getBody(), "UTF-8");
 
-    channel.basicConsume(queueName, true, deliverCallback, consumerTag -> { });
- 
-  }
-  
-  private static void updateCalendar(double temperature, double humidity, boolean rain, CalendarWeatherData calenderWeatherData) {
-  	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-  	// get today's date
-  	Calendar todaysDate = Calendar.getInstance();
-      String todaysDateString = df.format(todaysDate.getTime());
-  	
-  	// get tomorrow's date
-  	Calendar tomorrowsDate = Calendar.getInstance();
-      tomorrowsDate.add(Calendar.DAY_OF_MONTH, 1);
-      String tomorrowsDateString = df.format(tomorrowsDate.getTime());
-      
-     String prettyTodaysWeatherString = 
-    		 "Main Weather: " + calenderWeatherData.getMainWeather() +
-    		 "\nMeasured Temperature: " + temperature + 
-    		 "\nHumidity: " + humidity + 
-    		 "\nRain: " + rain + 
-    		 "\nCity temperature: " + calenderWeatherData.getTemperature();
-  
-     
-     String prettyTomorrowsWeatherString = 
-    		 "Main Weather: " + calenderWeatherData.getMainWeather() +
-    		 "\nMeasured Temperature: " + temperature + 
-    		 "\nHumidity: " + humidity + 
-    		 "\nRain: " + rain + 
-    		 "\nCity temperature: " + calenderWeatherData.getTemperature();
-     
-      // create/update calendar entries
-  	try {
-			CalendarQuickstart.updateEvent(calenderWeatherData.getMainWeather(), "Stuggi", prettyTodaysWeatherString, todaysDateString, "thisistheeventidofthese24hours");
+			// convert the message from String to JSON object
+			JsonObject messageJson = JsonCreator.convertStringToJsonObject(messageString);
+
+			// extract values from message
+			double temperature = JsonCreator.getSpecificDoubleAttribute(messageJson, "temperature");
+			double humidity = JsonCreator.getSpecificDoubleAttribute(messageJson, "humidity");
+			boolean rain = JsonCreator.getSpecificBooleanAttribute(messageJson, "rain");
+
+			// print extracted values
+			System.out.println("Measured Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain);
+
+			WeatherService weatherService = new WeatherService();
+			CurrentWeather currentWeather = weatherService.getWeatherFromCity(LOCATION, COUNTRYCODE);
+			CalendarWeatherData calendarData = weatherService.createCalendarDataCurrent(currentWeather);
+			
+			weatherService.findMinMaxTemperature();
+			
+//			DailyForecast dailyForecast = weatherService.getWeatherForecastFromCity(LOCATION, COUNTRYCODE);
+//			CalendarWeatherData calendarForecastData = weatherService.createCalendarDataForecast(dailyForecast);
+
+			System.out.println(calendarData.getMainWeather());
+			System.out.println("City temperature: " + calendarData.getTemperature());
+
+			updateCalendar(temperature, humidity, rain, calendarData);
+
+		};
+
+		channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
+		});
+
+	}
+
+	private static void updateCalendar(double temperature, double humidity, boolean rain,
+			CalendarWeatherData calenderCurrentWeatherData) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		// get today's date
+		Calendar todaysDate = Calendar.getInstance();
+		String todaysDateString = df.format(todaysDate.getTime());
+
+		// get tomorrow's date
+		Calendar tomorrowsDate = Calendar.getInstance();
+		tomorrowsDate.add(Calendar.DAY_OF_MONTH, 1);
+		String tomorrowsDateString = df.format(tomorrowsDate.getTime());
+
+		String prettyTodaysWeatherString = "Main Weather: " + calenderCurrentWeatherData.getMainWeather()
+				+ "\nMeasured Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain
+				+ "\nCity temperature: " + calenderCurrentWeatherData.getTemperature();
+
+//		String prettyTomorrowsWeatherString = "Main Weather: " + calendarForecastWeatherData.getMainWeather()
+//				+ "\nAverage Temperature: " + calendarForecastWeatherData.getTemperature() + "\nMax Temperature: "
+//				+ calendarForecastWeatherData.getMaxTemperature() + "\nMin Temperature: "
+//				+ calendarForecastWeatherData.getMinTemperature() + "\nHumidity: " + humidity + "\nRain: " + rain
+//				+ "\nCity temperature: " + calendarForecastWeatherData.getTemperature();
+
+		// create/update calendar entries
+		try {
+			CalendarQuickstart.updateEvent(calenderCurrentWeatherData.getMainWeather(), "Stuggi",
+					prettyTodaysWeatherString, todaysDateString, "thisistheeventidofthese24hours");
 		} catch (GeneralSecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -113,19 +111,17 @@ public class ReceiveLogs {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-  	
-  	try {
-			CalendarQuickstart.updateEvent("Updated Tomorrow", "Stuggi", "Wetterinfo", tomorrowsDateString, "thisistheeventidofthecoming24hours");
-		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-  }
-  
-  
-      
+//
+//		try {
+//			CalendarQuickstart.updateEvent("hallo", "Stuggi",
+//					prettyTomorrowsWeatherString, tomorrowsDateString, "thisistheeventidofthecoming24hours");
+//		} catch (GeneralSecurityException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+	}
 
 }

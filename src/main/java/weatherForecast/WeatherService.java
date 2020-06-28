@@ -1,5 +1,9 @@
 package weatherForecast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.List;
 
 import org.openweathermap.api.DataWeatherClient;
@@ -8,13 +12,14 @@ import org.openweathermap.api.model.Weather;
 import org.openweathermap.api.model.currentweather.CurrentWeather;
 import org.openweathermap.api.model.forecast.ForecastInformation;
 import org.openweathermap.api.model.forecast.daily.DailyForecast;
+import org.openweathermap.api.model.forecast.hourly.HourlyForecast;
 import org.openweathermap.api.query.Language;
 import org.openweathermap.api.query.QueryBuilderPicker;
 import org.openweathermap.api.query.ResponseFormat;
 import org.openweathermap.api.query.Type;
 import org.openweathermap.api.query.UnitFormat;
 import org.openweathermap.api.query.currentweather.CurrentWeatherOneLocationQuery;
-import org.openweathermap.api.query.forecast.daily.ByCityName;
+import org.openweathermap.api.query.forecast.hourly.ByCityName;
 
 import com.google.gson.JsonObject;
 
@@ -23,7 +28,7 @@ public class WeatherService {
 	
 	
 	public CurrentWeather getWeatherFromCity(String city, String countryCode) {
-		DataWeatherClient client = new UrlConnectionDataWeatherClient(key);
+		DataWeatherClient client = new UrlConnectionDataWeatherClient("e030cee405d4b9b32704de57c13778d2");
 		CurrentWeatherOneLocationQuery currentWeatherOneLocationQuery = QueryBuilderPicker.pick().currentWeather() // get current weather															// weather
 				.oneLocation() // for one location
 				.byCityName(city).countryCode(countryCode).type(Type.ACCURATE) // with Accurate search
@@ -48,26 +53,38 @@ public class WeatherService {
 		
 	}
 
-	public DailyForecast getWeatherForecastFromCity(String city, String countryCode) {
-		DataWeatherClient client = new UrlConnectionDataWeatherClient(key);
-		 ByCityName byCityNameForecast = QueryBuilderPicker.pick()
+	public void getWeatherForecastFromCity(String city, String countryCode) {
+		DataWeatherClient client = new UrlConnectionDataWeatherClient("e030cee405d4b9b32704de57c13778d2");
+	        ByCityName byCityNameForecast = QueryBuilderPicker.pick()
 	                .forecast()                                         // get forecast
-	                .daily()                                            // it should be dailt
-	                .byCityName(city)                              // for Kharkiv city
-	                .countryCode(countryCode)                                  // in Ukraine
+	                .hourly()                                           // it should be hourly forecast
+	                .byCityName("Kharkiv")                              // for Kharkiv city
+	                .countryCode("UA")                                  // in Ukraine
 	                .unitFormat(UnitFormat.METRIC)                      // in Metric units
 	                .language(Language.ENGLISH)                         // in English
-	                .responseFormat(ResponseFormat.JSON)
+	                .count(16)                                           // limit results to 5 forecasts
 	                .build();
-		ForecastInformation<DailyForecast> forecastInformation = client.getForecastInformation(byCityNameForecast);
-		System.out.println("Debug: " + forecastInformation.getCity());
-		for (DailyForecast forecast : forecastInformation.getForecasts()) {
-            System.out.println(String.format("Temperature on %s will be: %s",
-                    forecast.getDateTime().toString(), forecast.getTemperature().toString()));
-        }
-		DailyForecast weatherTomorrow= forecastInformation.getForecasts().get(1);
-		return weatherTomorrow;
+	        ForecastInformation<HourlyForecast> forecastInformation = client.getForecastInformation(byCityNameForecast);
+	        System.out.println("Forecasts for " + forecastInformation.getCity() + ":");
+	        for (HourlyForecast forecast : forecastInformation.getForecasts()) {
+	            System.out.println(forecast.getMainParameters().getTemperature());
+	        }
 	}
+	
+	
+	public void findMinMaxTemperature() {
+		int hour = LocalDateTime.now().getHour();
+		
+		double timeLeftTill24 = 24 - hour;
+		double countTill24 = Math.ceil(timeLeftTill24 / 3);
+		
+		System.out.println(hour);
+		System.out.println(timeLeftTill24);
+		System.out.println(countTill24);
+		
+	}
+	
+	
 	
 	
 	
@@ -114,9 +131,13 @@ public class WeatherService {
 		
 		
 		double temperature = currentWeather.getMainParameters().getTemperature();
+		
 		double humidity = currentWeather.getMainParameters().getHumidity(); 
 		
-		CalendarWeatherData calendarData = new CalendarWeatherData(temperature, humidity, weatherDescription);
+		CalendarWeatherData calendarData = new CalendarWeatherData();
+		calendarData.setTemperature(temperature);
+		calendarData.setHumidity(humidity);
+		calendarData.setMainWeather(weatherDescription);
 		return calendarData;
 	}
 	
@@ -132,7 +153,7 @@ public class WeatherService {
 		
 		double humidity = dailyForecast.getHumidity(); 
 		
-		CalendarWeatherData calendarData = new CalendarWeatherData(temperature, humidity, weatherDescription);
+		CalendarWeatherData calendarData = new CalendarWeatherData(temperature, humidity, weatherDescription, maxTemperature, minTemperature);
 		return calendarData;
 		
 	}

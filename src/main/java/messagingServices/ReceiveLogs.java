@@ -19,6 +19,8 @@ import java.util.Calendar;
 import java.util.concurrent.TimeoutException;
 import java.util.spi.CalendarDataProvider;
 
+import org.openweathermap.api.model.currentweather.CurrentWeather;
+
 import com.google.gson.JsonObject;
 public class ReceiveLogs {
   private static final String EXCHANGE_NAME = "sensor data";
@@ -54,7 +56,7 @@ public class ReceiveLogs {
         System.out.println("Measured Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain);
         
         WeatherService weatherService = new WeatherService();
-        CombinedWeatherData combinedData = weatherService.getWeatherFromCity("Stuttgart", "DE");
+        CurrentWeather combinedData = weatherService.getWeatherFromCity("Stuttgart", "DE");
         CalendarWeatherData calendarData = weatherService.createCalendarData(combinedData);
         
         System.out.println(calendarData.getMainWeather());

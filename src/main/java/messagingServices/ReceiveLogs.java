@@ -8,6 +8,7 @@ import com.rabbitmq.client.DeliverCallback;
 import calendarFunctions.CalendarQuickstart;
 import communication.JsonCreator;
 import weatherForecast.CalendarWeatherData;
+import weatherForecast.CombinedForecastData;
 import weatherForecast.CombinedWeatherData;
 import weatherForecast.WeatherService;
 
@@ -61,15 +62,12 @@ public class ReceiveLogs {
 			CurrentWeather currentWeather = weatherService.getWeatherFromCity(LOCATION, COUNTRYCODE);
 			CalendarWeatherData calendarData = weatherService.createCalendarDataCurrent(currentWeather);
 			
-			weatherService.findMinMaxTemperature();
-			
-//			DailyForecast dailyForecast = weatherService.getWeatherForecastFromCity(LOCATION, COUNTRYCODE);
-//			CalendarWeatherData calendarForecastData = weatherService.createCalendarDataForecast(dailyForecast);
+			CombinedForecastData combinedForecastData = weatherService.getWeatherForecastFromCity(LOCATION, COUNTRYCODE);
 
 			System.out.println(calendarData.getMainWeather());
 			System.out.println("City temperature: " + calendarData.getTemperature());
 
-			updateCalendar(temperature, humidity, rain, calendarData);
+			updateCalendar(temperature, humidity, rain, calendarData, combinedForecastData);
 
 		};
 
@@ -79,7 +77,7 @@ public class ReceiveLogs {
 	}
 
 	private static void updateCalendar(double temperature, double humidity, boolean rain,
-			CalendarWeatherData calenderCurrentWeatherData) {
+			CalendarWeatherData calenderCurrentWeatherData, CombinedForecastData combinedForecastData) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		// get today's date
 		Calendar todaysDate = Calendar.getInstance();
@@ -94,15 +92,14 @@ public class ReceiveLogs {
 				+ "\nMeasured Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain
 				+ "\nCity temperature: " + calenderCurrentWeatherData.getTemperature();
 
-//		String prettyTomorrowsWeatherString = "Main Weather: " + calendarForecastWeatherData.getMainWeather()
-//				+ "\nAverage Temperature: " + calendarForecastWeatherData.getTemperature() + "\nMax Temperature: "
-//				+ calendarForecastWeatherData.getMaxTemperature() + "\nMin Temperature: "
-//				+ calendarForecastWeatherData.getMinTemperature() + "\nHumidity: " + humidity + "\nRain: " + rain
-//				+ "\nCity temperature: " + calendarForecastWeatherData.getTemperature();
+		String prettyTomorrowsWeatherString = "Maximum Temperature: " + combinedForecastData.getMaxTemperature()
+				+ "\nMinimal Temperature: " + combinedForecastData.getMinTemperature() + "\nHumidity: "
+				+ combinedForecastData.getAverageHumidity() + "\nRain prediction: "
+				+ combinedForecastData.isWillItRain();
 
 		// create/update calendar entries
 		try {
-			CalendarQuickstart.updateEvent(calenderCurrentWeatherData.getMainWeather(), "Stuggi",
+			CalendarQuickstart.updateEvent(calenderCurrentWeatherData.getMainWeather(), LOCATION + ", " + COUNTRYCODE,
 					prettyTodaysWeatherString, todaysDateString, "thisistheeventidofthese24hours");
 		} catch (GeneralSecurityException e) {
 			// TODO Auto-generated catch block
@@ -112,16 +109,16 @@ public class ReceiveLogs {
 			e.printStackTrace();
 		}
 //
-//		try {
-//			CalendarQuickstart.updateEvent("hallo", "Stuggi",
-//					prettyTomorrowsWeatherString, tomorrowsDateString, "thisistheeventidofthecoming24hours");
-//		} catch (GeneralSecurityException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			CalendarQuickstart.updateEvent("Frog Cast", LOCATION + ", " + COUNTRYCODE,
+					prettyTomorrowsWeatherString, tomorrowsDateString, "thisistheeventidofthecoming24hours");
+		} catch (GeneralSecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

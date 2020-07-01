@@ -94,8 +94,8 @@ public class ReceiveLogs {
 
 		String prettyTomorrowsWeatherString = "Maximum Temperature: " + combinedForecastData.getMaxTemperature()
 				+ "\nMinimal Temperature: " + combinedForecastData.getMinTemperature() + "\nHumidity: "
-				+ combinedForecastData.getAverageHumidity() + "\nRain prediction: "
-				+ combinedForecastData.isWillItRain();
+				+ combinedForecastData.getAverageHumidity() + "\nMain Weather: "
+				+ combinedForecastData.getRainDescription();
 
 		// create/update calendar entries
 		try {

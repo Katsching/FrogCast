@@ -96,6 +96,23 @@
 			<artifactId>amqp-client</artifactId>
 			<version>5.9.0</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.code.geocoder-java/geocoder-java -->
+		<dependency>
+			<groupId>com.google.code.geocoder-java</groupId>
+			<artifactId>geocoder-java</artifactId>
+			<version>0.16</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.maps/google-maps-services -->
+		<dependency>
+			<groupId>com.google.maps</groupId>
+			<artifactId>google-maps-services</artifactId>
+			<version>0.14.0</version>
+		</dependency>
+
+
+
 	</dependencies>
 
 	<build>

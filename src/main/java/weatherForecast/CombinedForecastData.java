@@ -4,7 +4,7 @@ public class CombinedForecastData {
 	private double maxTemperature;
 	private double minTemperature;
 	private double averageHumidity;
-	private boolean willItRain;
+	private String rainDescription;
 
 	public double getMaxTemperature() {
 		return maxTemperature;
@@ -30,21 +30,21 @@ public class CombinedForecastData {
 		this.averageHumidity = averageHumidity;
 	}
 
-	public boolean isWillItRain() {
-		return willItRain;
+	public String getRainDescription() {
+		return rainDescription;
 	}
 
-	public void setWillItRain(boolean willItRain) {
-		this.willItRain = willItRain;
+	public void setRainDescription(String rainDescription) {
+		this.rainDescription = rainDescription;
 	}
 
 	public CombinedForecastData(double maxTemperature, double minTemperature, double averageHumidity,
-			boolean willItRain) {
+			String rainDescription) {
 		super();
 		this.maxTemperature = maxTemperature;
 		this.minTemperature = minTemperature;
 		this.averageHumidity = averageHumidity;
-		this.willItRain = willItRain;
+		this.rainDescription = rainDescription;
 	}
 
 }

@@ -1,5 +1,6 @@
 package weatherForecast;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -27,8 +28,12 @@ import org.openweathermap.api.query.forecast.hourly.ByCityName;
 
 import com.google.gson.JsonObject;
 
+import DailyWeatherJson.FullOneApiCall;
+
 public class WeatherService {
-	final String key = "e030cee405d4b9b32704de57c13778d2";
+	private static final String APIKEY = "e030cee405d4b9b32704de57c13778d2";
+	private static final double LATITUDE = 48.94744;
+	private static final double LONGITUDE = 9.43718;
 
 	public CurrentWeather getWeatherFromCity(String city, String countryCode) {
 		DataWeatherClient client = new UrlConnectionDataWeatherClient("e030cee405d4b9b32704de57c13778d2");
@@ -59,59 +64,73 @@ public class WeatherService {
 
 	}
 
-	public CombinedForecastData getWeatherForecastFromCity(String city, String countryCode) {
+	public CombinedForecastData getWeatherForecastFromCity(String city, String countryCode) throws IOException {
 
-		DataWeatherClient client = new UrlConnectionDataWeatherClient("e030cee405d4b9b32704de57c13778d2");
-		ByCityName byCityNameForecast = QueryBuilderPicker.pick().forecast() // get forecast
-				.hourly() // it should be hourly forecast
-				.byCityName(city) // for Kharkiv city
-				.countryCode(countryCode) // in Ukraine
-				.unitFormat(UnitFormat.METRIC) // in Metric units
-				.language(Language.ENGLISH) // in English
-				.count(16) // limit results to 5 forecasts
-				.build();
-		ForecastInformation<HourlyForecast> forecastInformation = client.getForecastInformation(byCityNameForecast);
-		System.out.println("Forecasts for " + forecastInformation.getCity() + ":");
+//		DataWeatherClient client = new UrlConnectionDataWeatherClient("e030cee405d4b9b32704de57c13778d2");
+//		ByCityName byCityNameForecast = QueryBuilderPicker.pick().forecast() // get forecast
+//				.hourly() // it should be hourly forecast
+//				.byCityName(city) // for Kharkiv city
+//				.countryCode(countryCode) // in Ukraine
+//				.unitFormat(UnitFormat.METRIC) // in Metric units
+//				.language(Language.ENGLISH) // in English
+//				.count(16) // limit results to 5 forecasts
+//				.build();
+//		ForecastInformation<HourlyForecast> forecastInformation = client.getForecastInformation(byCityNameForecast);
+//		System.out.println("Forecasts for " + forecastInformation.getCity() + ":");
+//
+//		int count = (int) findMinMaxTemperature();
+//
+//		double minimalTemperature = Double.MAX_VALUE;
+//		double maximalTemperature = Double.MIN_VALUE;
+//		List<Double> humidityList = new ArrayList<Double>();
+//		Map<Integer, Rain> rainTimeMap = new HashMap<Integer, Rain>();
+//		boolean willItRainTomorrow = false;
+//
+//		List<HourlyForecast> foreCastList = forecastInformation.getForecasts();
+//		for (int i = count; i < count + 8; i++) {
+//			HourlyForecast forecast = foreCastList.get(i);
+//			double currentMaxTemp = forecast.getMainParameters().getMaximumTemperature();
+//			double currentMinTemp = forecast.getMainParameters().getMinimumTemperature();
+//
+//			if (currentMaxTemp > maximalTemperature) {
+//				maximalTemperature = currentMaxTemp;
+//			}
+//
+//			if (currentMinTemp < minimalTemperature) {
+//				minimalTemperature = currentMinTemp;
+//			}
+//
+//			humidityList.add(forecast.getMainParameters().getHumidity());
+//			rainTimeMap.put(i, forecast.getRain());
+//
+////			System.out.println("count: " + i + " max: " + currentMaxTemp + " min: " + currentMinTemp);
+//
+//		}
+//
+//		for (Rain value : rainTimeMap.values()) {
+//			if (value != null) {
+//				willItRainTomorrow = true;
+//			}
+//		}
+//
+//		Double averageHumidity = humidityList.stream().mapToDouble(val -> val).average().orElse(0.0);
+////
+//		CombinedForecastData combinedForecastData = new CombinedForecastData(maximalTemperature, minimalTemperature,
+//				averageHumidity, willItRainTomorrow);
+		
+		
+		OpenWeatherApiParser openWeatherApiParser = new OpenWeatherApiParser();
 
-		int count = (int) findMinMaxTemperature();
+		FullOneApiCall fullOneApiCall = openWeatherApiParser.getResponseFromWebsite(LATITUDE, LONGITUDE, APIKEY);
 
-		double minimalTemperature = Double.MAX_VALUE;
-		double maximalTemperature = Double.MIN_VALUE;
-		List<Double> humidityList = new ArrayList<Double>();
-		Map<Integer, Rain> rainTimeMap = new HashMap<Integer, Rain>();
-		boolean willItRainTomorrow = false;
+		double maximalTemperature = fullOneApiCall.getDaily().get(1).getTemp().getMax();
+		double minimalTemperature = fullOneApiCall.getDaily().get(1).getTemp().getMin();
+		int averageHumidity = fullOneApiCall.getDaily().get(1).getHumidity();
+		String rainDescription = fullOneApiCall.getDaily().get(1).getMainWeather().get(0).getDescription();
 
-		List<HourlyForecast> foreCastList = forecastInformation.getForecasts();
-		for (int i = count; i < count + 8; i++) {
-			HourlyForecast forecast = foreCastList.get(i);
-			double currentMaxTemp = forecast.getMainParameters().getMaximumTemperature();
-			double currentMinTemp = forecast.getMainParameters().getMinimumTemperature();
-
-			if (currentMaxTemp > maximalTemperature) {
-				maximalTemperature = currentMaxTemp;
-			}
-
-			if (currentMinTemp < minimalTemperature) {
-				minimalTemperature = currentMinTemp;
-			}
-
-			humidityList.add(forecast.getMainParameters().getHumidity());
-			rainTimeMap.put(i, forecast.getRain());
-
-//			System.out.println("count: " + i + " max: " + currentMaxTemp + " min: " + currentMinTemp);
-
-		}
-
-		for (Rain value : rainTimeMap.values()) {
-			if (value != null) {
-				willItRainTomorrow = true;
-			}
-		}
-
-		Double averageHumidity = humidityList.stream().mapToDouble(val -> val).average().orElse(0.0);
-
+		
 		CombinedForecastData combinedForecastData = new CombinedForecastData(maximalTemperature, minimalTemperature,
-				averageHumidity, willItRainTomorrow);
+				averageHumidity, rainDescription);
 		
 		return combinedForecastData;
 

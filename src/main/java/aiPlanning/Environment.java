@@ -6,8 +6,74 @@ import java.util.List;
 public class Environment {
 	
 //	initialization of possible states and actions
-	ArrayList<String[]> states = new ArrayList<String[]>(List.of(new String[] { "bulb_red", "frog_down" }, new String[] { "bulb_red", "frog_down" }, new String[] { "bulb_green", "frog_up" }, new String[] { "bulb_green", "frog_down" }, new String[]{ "bulb_blue", "frog_up" }, new String[] { "bulb_blue", "frog_down" }));
+	ArrayList<String[]> states = new ArrayList<String[]>(List.of(new String[] { "bulb_red", "frog_down" }, new String[] { "bulb_red", "frog_up" }, new String[] { "bulb_green", "frog_up" }, new String[] { "bulb_green", "frog_down" }, new String[]{ "bulb_blue", "frog_up" }, new String[] { "bulb_blue", "frog_down" }));
 	ArrayList<String> actions = new ArrayList<String>(List.of("climb", "switch_red_green", "switch_green_blue", "switch_red_blue"));
+	
+	ArrayList<String> positions = new ArrayList<String>(List.of("down", "center", "up"));
+	ArrayList<String> colors = new ArrayList<String>(List.of("magenta", "blue", "yellow", "white", "light blue"));
+	
+	public ArrayList<String> getActions(String sourcePosition, String sourceColor, String destinationPosition, String destinationColor) {
+		ArrayList<String> actions = new ArrayList<String>();
+		
+		actions.addAll(findColor(sourceColor, destinationColor));
+		actions.addAll(findPosition(sourcePosition, destinationPosition));
+		
+		return actions;
+	}
+	
+	private ArrayList<String> findColor(String sourceColor, String destinationColor) {
+		String colorRight = sourceColor;
+		String colorLeft = sourceColor;
+		int colorIntRight = colors.indexOf(sourceColor);
+		int colorIntLeft = colors.indexOf(sourceColor);
+		
+		ArrayList<String> actionsRight = new ArrayList<String>();
+		ArrayList<String> actionsLeft = new ArrayList<String>();
+		
+		while (!colorRight.equals(destinationColor) && !colorLeft.equals(destinationColor)) {
+			colorIntRight = (colorIntRight + 1) % colors.size();
+			colorIntLeft = ((colorIntLeft - 1) % colors.size() + colors.size()) % colors.size();
+			colorRight = colors.get(colorIntRight);
+			colorLeft = colors.get(colorIntLeft);
+			actionsRight.add("right");
+			actionsLeft.add("left");
+		}
+		
+		if (colorRight == destinationColor) {
+			return actionsRight;
+		} else {
+			return actionsLeft;
+		}
+	}
+	
+	private ArrayList<String> findPosition(String sourcePosition, String destinationPosition) {
+		String positionUp = sourcePosition;
+		String positionDown = sourcePosition;
+		int positionIntUp = positions.indexOf(sourcePosition);
+		int positionIntDown = positions.indexOf(sourcePosition);
+		
+		ArrayList<String> actionsUp = new ArrayList<String>();
+		ArrayList<String> actionsDown = new ArrayList<String>();
+		
+		while (!positionUp.equals(destinationPosition) && !positionDown.equals(destinationPosition)) {
+			if (positionIntUp != positions.size() - 1) {
+				positionIntUp = positionIntUp + 1;
+				actionsUp.add("up");
+				positionUp = positions.get(positionIntUp);
+			}
+			if (positionIntDown != 0) {
+				positionIntDown = positionIntDown - 1;
+				actionsDown.add("down");
+				positionDown = positions.get(positionIntDown);
+			}
+		}
+		
+		if (positionUp == destinationPosition) {
+			return actionsUp;
+		} else {
+			return actionsDown;
+		}
+	}
 	
 	/**
 	 * performs an action on a state of frog

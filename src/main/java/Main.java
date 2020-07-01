@@ -2,11 +2,13 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 //import java.util.Date;
 import java.util.Calendar;
 
 import calendarFunctions.CalendarQuickstart;
 import weatherForecast.WeatherService;
+import aiPlanning.Environment;
 
 public class Main {
 
@@ -40,25 +42,32 @@ public class Main {
 //			e1.printStackTrace();
 //		}
     	
-    	try {
-			CalendarQuickstart.updateEvent("Updated Today", "Stuggi", "Wetterinfo", todaysDateString, "thisistheeventidofthese24hours");
-		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    	try {
-			CalendarQuickstart.updateEvent("Updated Tomorrow", "Stuggi", "Wetterinfo", tomorrowsDateString, "thisistheeventidofthecoming24hours");
-		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//    	try {
+//			CalendarQuickstart.updateEvent("Updated Today", "Stuggi", "Wetterinfo", todaysDateString, "thisistheeventidofthese24hours");
+//		} catch (GeneralSecurityException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//    	
+//    	try {
+//			CalendarQuickstart.updateEvent("Updated Tomorrow", "Stuggi", "Wetterinfo", tomorrowsDateString, "thisistheeventidofthecoming24hours");
+//		} catch (GeneralSecurityException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+        
+        Environment environment = new Environment();
+        
+        ArrayList<String> actions = environment.getActions("down", "magenta", "up", "light blue");
+        for (String action : actions) {
+        	System.out.println(action);
+        }
     }
     
     

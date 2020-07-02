@@ -2,8 +2,8 @@
     
     (:domain LEDPlanner)
     (:objects 
-        bot mid top 
-        white blue magenta
+        bot  mid top -position
+        white blue magenta -color
     )
 
     (:init 

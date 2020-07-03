@@ -7,7 +7,7 @@
     )
 
     (:init 
-        (LEDStatus mid)
+		(LEDStatus bot)
         (colorStatus white)
 
         (LEDCanMove bot mid)

@@ -3,12 +3,12 @@
     (:domain LEDPlanner)
     (:objects 
         bot  mid top -position
-        white blue magenta -color
+        white blue magenta lightBlue -color
     )
 
     (:init 
-		(LEDStatus bot)
-        (colorStatus white)
+		(LEDStatus top)
+		(colorStatus magenta)
 
         (LEDCanMove bot mid)
         (LEDCanMove mid top)
@@ -17,16 +17,18 @@
 
         (colorCanChange white blue)
         (colorCanChange blue magenta)
-        (colorCanChange magenta white)
+        (colorCanChange magenta lightBlue)
+        (colorCanChange lightBlue white)
 
+		(colorCanChange lightBlue magenta)
         (colorCanChange magenta blue)
         (colorCanChange blue white)
-        (colorCanChange white magenta)
+        (colorCanChange white lightBlue)
     )
 
     (:goal (and 
-        (LEDStatus top)
-        (colorStatus magenta)
+		(LEDStatus top)
+		(colorStatus magenta)
     )
     )
   

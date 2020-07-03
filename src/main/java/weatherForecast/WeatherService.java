@@ -64,7 +64,7 @@ public class WeatherService {
 
 	}
 
-	public CombinedForecastData getWeatherForecastFromCity(String city, String countryCode) throws IOException {
+	public CombinedForecastData getWeatherForecastFromCity() throws IOException {
 
 //		DataWeatherClient client = new UrlConnectionDataWeatherClient("e030cee405d4b9b32704de57c13778d2");
 //		ByCityName byCityNameForecast = QueryBuilderPicker.pick().forecast() // get forecast
@@ -126,11 +126,11 @@ public class WeatherService {
 		double maximalTemperature = fullOneApiCall.getDaily().get(1).getTemp().getMax();
 		double minimalTemperature = fullOneApiCall.getDaily().get(1).getTemp().getMin();
 		int averageHumidity = fullOneApiCall.getDaily().get(1).getHumidity();
-		String rainDescription = fullOneApiCall.getDaily().get(1).getMainWeather().get(0).getDescription();
-
+		String weatherDescription = fullOneApiCall.getDaily().get(1).getMainWeather().get(0).getDescription();
+		String mainWeather = fullOneApiCall.getDaily().get(1).getMainWeather().get(0).getMain();
 		
 		CombinedForecastData combinedForecastData = new CombinedForecastData(maximalTemperature, minimalTemperature,
-				averageHumidity, rainDescription);
+				averageHumidity, weatherDescription, mainWeather);
 		
 		return combinedForecastData;
 
@@ -165,28 +165,43 @@ public class WeatherService {
 				+ currentWeather.getMainParameters().getPressure());
 	}
 
-	private JsonObject addWeatherDataToJson(double rain, double cloud) {
+//	private JsonObject addWeatherDataToJson(double rain, double cloud) {
+//
+//		String position = convertWeatherToPosition();
+//		String color = convertWeatherToColor();
+//
+//		JsonObject json = new JsonObject();
+//		json.addProperty("position", position);
+//		json.addProperty("color", color);
+//
+//		return json;
+//	}
 
-		Integer position = convertWeatherToPosition();
-		String color = convertWeatherToColor();
-
-		JsonObject json = new JsonObject();
-		json.addProperty("position", position);
-		json.addProperty("color", color);
-
-		return json;
+	public String convertWeatherToPosition(String weather) {
+//		String position = switch(weather) {
+//			case "Thunderstorm", "Drizzle", "Rain", "Snow" -> "bot";
+//			case "Haze", "Mist", "Fog", "Squal" -> "mid";
+//			case "Clear", "Clouds" -> "top";
+//			default -> "mid";
+//		};
+//		return position;
+		
+		switch(weather) {
+			case "Thunderstorm": case "Drizzle": case "Rain": case "Snow": return "bot";
+			case "Haze": case "Mist": case "Fog": case "Squal": return "mid";
+			case "Clear": case "Clouds": return "top";
+			default: return "mid";
+		}
 	}
 
-	private Integer convertWeatherToPosition() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private String convertWeatherToColor() {
-		// TODO Auto-generated method stub
-		String color = "";
-
-		return color;
+	public String convertWeatherToColor(String weather) {
+		switch(weather) {
+			case "Thunderstorm": case "Fog": return "magenta";
+			case "Drizzle": case "Haze": case "Clouds": return "lightBlue";
+			case "Clear": case "Squal": case "Snow": return "white";
+			case "Mist": case "Rain": return "blue";
+			default: return "white";
+		}
 	}
 
 	public CalendarWeatherData createCalendarDataCurrent(CurrentWeather currentWeather) {
@@ -224,5 +239,4 @@ public class WeatherService {
 		return calendarData;
 
 	}
-
 }

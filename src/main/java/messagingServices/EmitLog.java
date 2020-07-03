@@ -1,5 +1,9 @@
 package messagingServices;
 import com.rabbitmq.client.ConnectionFactory;
+
+import weatherForecast.CombinedForecastData;
+import weatherForecast.WeatherService;
+
 import com.rabbitmq.client.Connection;
 import com.google.api.services.calendar.model.CreateConferenceRequest;
 import com.google.gson.JsonObject;
@@ -20,8 +24,15 @@ public class EmitLog {
 			channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
 
 //			String message = argv.length < 1 ? "info: Hello World!" : String.join(" ", argv);
-			String message = createJsonObject("top", "magenta", 5.0 , 60.0).toString();
+			WeatherService weatherService = new WeatherService();
+			CombinedForecastData combinedForecastData = weatherService.getWeatherForecastFromCity();
+			String weather = combinedForecastData.getMainWeather();
+			String position = weatherService.convertWeatherToPosition(weather);
+			String color = weatherService.convertWeatherToColor(weather);
+			String message = createJsonObject(position, color, 5.0 , 60.0).toString();
 
+			System.out.println(weather);
+			
 			channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
 			System.out.println(" [x] Sent '" + message + "'");
 		}

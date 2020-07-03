@@ -62,7 +62,7 @@ public class ReceiveLogs {
 			CurrentWeather currentWeather = weatherService.getWeatherFromCity(LOCATION, COUNTRYCODE);
 			CalendarWeatherData calendarData = weatherService.createCalendarDataCurrent(currentWeather);
 			
-			CombinedForecastData combinedForecastData = weatherService.getWeatherForecastFromCity(LOCATION, COUNTRYCODE);
+			CombinedForecastData combinedForecastData = weatherService.getWeatherForecastFromCity();
 
 			System.out.println(calendarData.getMainWeather());
 			System.out.println("City temperature: " + calendarData.getTemperature());
@@ -95,7 +95,7 @@ public class ReceiveLogs {
 		String prettyTomorrowsWeatherString = "Maximum Temperature: " + combinedForecastData.getMaxTemperature()
 				+ "\nMinimal Temperature: " + combinedForecastData.getMinTemperature() + "\nHumidity: "
 				+ combinedForecastData.getAverageHumidity() + "\nMain Weather: "
-				+ combinedForecastData.getRainDescription();
+				+ combinedForecastData.getWeatherDescription();
 
 		// create/update calendar entries
 		try {

@@ -27,7 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class JavaFF_AI {
+public class AI_Solver {
 
 	public static void main(String[] args){
 //		File domainFile = new File("C:\\Users\\dYTe\\git\\FrogCast\\src\\main\\java\\aiPlanning\\domain.pddl");
@@ -87,10 +87,10 @@ public class JavaFF_AI {
 	
 	private static List<String> sendPostToSolver() throws ClientProtocolException, IOException, URISyntaxException {
 
-		URL domainURL = JavaFF_AI.class.getClassLoader().getResource("domain.pddl");
+		URL domainURL = AI_Solver.class.getClassLoader().getResource("domain.pddl");
 		File domainFile = Paths.get(domainURL.toURI()).toFile();
 		
-		URL problemURL = JavaFF_AI.class.getClassLoader().getResource("problem.pddl");
+		URL problemURL = AI_Solver.class.getClassLoader().getResource("problem.pddl");
 		File problemFile = Paths.get(problemURL.toURI()).toFile();
 
 		String domainContent = Files.readString(domainFile.toPath(), StandardCharsets.US_ASCII);
@@ -104,6 +104,8 @@ public class JavaFF_AI {
 
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost("http://solver.planning.domains/solve");
+		
+		
 
 		StringEntity entity = new StringEntity(fullJson.toString());
 		httpPost.setEntity(entity);
@@ -123,7 +125,6 @@ public class JavaFF_AI {
 		for(JsonElement planElement: planJsonArray) {
 			JsonObject planJson = planElement.getAsJsonObject();
 			JsonElement name = planJson.getAsJsonPrimitive("name");
-			System.out.println("test: " + name);
 			planList.add(name.toString());
 		}
 //		JsonElement jsonElement = planJsonArray.get(0)
@@ -133,7 +134,7 @@ public class JavaFF_AI {
 		return(planList);
 	}
 	
-	private static List<String> getPlanAndUpdateProblem(String position, String color) throws IOException, URISyntaxException {
+	public static List<String> getPlanAndUpdateProblem(String position, String color) throws IOException, URISyntaxException {
 		writeLine(30, "\t\t(LEDStatus " + position + ")");
 		writeLine(31, "\t\t(colorStatus " + color + ")");
 		
@@ -152,13 +153,12 @@ public class JavaFF_AI {
 	}
 	
 	private static void writeLine(int lineNumber, String data) throws IOException, URISyntaxException {
-		URL res = JavaFF_AI.class.getClassLoader().getResource("problem.pddl");
+		URL res = AI_Solver.class.getClassLoader().getResource("problem.pddl");
 		File file = Paths.get(res.toURI()).toFile();
 		String absolutePath = file.getAbsolutePath();
 	    Path problemPath = Paths.get(absolutePath);
 	    List<String> lines = Files.readAllLines(problemPath, StandardCharsets.UTF_8);
 	    lines.set(lineNumber - 1, data);
 	    Files.write(problemPath, lines, StandardCharsets.UTF_8);
-	    System.out.println("test umschreiben");
 	}
 }

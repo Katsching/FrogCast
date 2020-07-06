@@ -8,7 +8,6 @@ import java.util.Calendar;
 
 import calendarFunctions.CalendarQuickstart;
 import weatherForecast.WeatherService;
-import aiPlanning.Environment;
 
 public class Main {
 
@@ -61,13 +60,7 @@ public class Main {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-        
-        Environment environment = new Environment();
-        
-        ArrayList<String> actions = environment.getActions("down", "magenta", "up", "light blue");
-        for (String action : actions) {
-        	System.out.println(action);
-        }
+
     }
     
     

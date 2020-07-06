@@ -1,6 +1,7 @@
 package messagingServices;
 import com.rabbitmq.client.ConnectionFactory;
 
+import aiPlanning.AI_Solver;
 import weatherForecast.CombinedForecastData;
 import weatherForecast.WeatherService;
 
@@ -29,6 +30,9 @@ public class EmitLog {
 			String weather = combinedForecastData.getMainWeather();
 			String position = weatherService.convertWeatherToPosition(weather);
 			String color = weatherService.convertWeatherToColor(weather);
+			
+			AI_Solver.getPlanAndUpdateProblem(position, color);
+			
 			String message = createJsonObject(position, color, 5.0 , 60.0).toString();
 
 			System.out.println(weather);

@@ -27,8 +27,8 @@
     )
 
     (:goal (and 
-		(LEDStatus top)
-		(colorStatus magenta)
+		(LEDStatus bot)
+		(colorStatus white)
     )
     )
   

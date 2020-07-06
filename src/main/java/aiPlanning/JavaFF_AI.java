@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,33 +14,22 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import DailyWeatherJson.FullOneApiCall;
-
 public class JavaFF_AI {
 
-	public static void main(String[] args) throws ClientProtocolException, IOException {
+	public static void main(String[] args){
 //		File domainFile = new File("C:\\Users\\dYTe\\git\\FrogCast\\src\\main\\java\\aiPlanning\\domain.pddl");
 //		File problemFile = new File("C:\\Users\\dYTe\\git\\FrogCast\\src\\main\\java\\aiPlanning\\problem.pddl");
 //
@@ -81,14 +72,26 @@ public class JavaFF_AI {
 ////		JsonElement jsonElement = planJsonArray.get(0)
 ////		System.out.println(result.toString());
 //		client.close();
-		
-		getPlanAndUpdateProblem("top", "magenta");
+
+		try {
+			getPlanAndUpdateProblem("bot", "blue");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
-	private static List<String> sendPostToSolver() throws ClientProtocolException, IOException {
-		File domainFile = new File("C:\\Users\\dYTe\\git\\FrogCast\\src\\main\\java\\aiPlanning\\domain.pddl");
-		File problemFile = new File("C:\\Users\\dYTe\\git\\FrogCast\\src\\main\\java\\aiPlanning\\problem.pddl");
+	private static List<String> sendPostToSolver() throws ClientProtocolException, IOException, URISyntaxException {
+
+		URL domainURL = JavaFF_AI.class.getClassLoader().getResource("domain.pddl");
+		File domainFile = Paths.get(domainURL.toURI()).toFile();
+		
+		URL problemURL = JavaFF_AI.class.getClassLoader().getResource("problem.pddl");
+		File problemFile = Paths.get(problemURL.toURI()).toFile();
 
 		String domainContent = Files.readString(domainFile.toPath(), StandardCharsets.US_ASCII);
 		String problemContent = Files.readString(problemFile.toPath(), StandardCharsets.US_ASCII);
@@ -130,11 +133,17 @@ public class JavaFF_AI {
 		return(planList);
 	}
 	
-	private static List<String> getPlanAndUpdateProblem(String position, String color) throws IOException {
+	private static List<String> getPlanAndUpdateProblem(String position, String color) throws IOException, URISyntaxException {
 		writeLine(30, "\t\t(LEDStatus " + position + ")");
 		writeLine(31, "\t\t(colorStatus " + color + ")");
 		
-		List<String> planList = sendPostToSolver();
+		List<String> planList;
+		try {
+			planList = sendPostToSolver();
+		} catch (NullPointerException e) {
+			List<String> emptyList = new ArrayList<String>();
+			return emptyList;
+		}
 		
 		writeLine(10, "\t\t(LEDStatus " + position + ")");
 		writeLine(11, "\t\t(colorStatus " + color + ")");
@@ -142,10 +151,14 @@ public class JavaFF_AI {
 		return(planList);
 	}
 	
-	private static void writeLine(int lineNumber, String data) throws IOException {
-	    Path path = Paths.get("C:\\Users\\dYTe\\git\\FrogCast\\src\\main\\java\\aiPlanning\\problem.pddl");
-	    List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+	private static void writeLine(int lineNumber, String data) throws IOException, URISyntaxException {
+		URL res = JavaFF_AI.class.getClassLoader().getResource("problem.pddl");
+		File file = Paths.get(res.toURI()).toFile();
+		String absolutePath = file.getAbsolutePath();
+	    Path problemPath = Paths.get(absolutePath);
+	    List<String> lines = Files.readAllLines(problemPath, StandardCharsets.UTF_8);
 	    lines.set(lineNumber - 1, data);
-	    Files.write(path, lines, StandardCharsets.UTF_8);
+	    Files.write(problemPath, lines, StandardCharsets.UTF_8);
+	    System.out.println("test umschreiben");
 	}
 }

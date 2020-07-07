@@ -197,7 +197,7 @@ public class WeatherService {
 	public String convertWeatherToColor(String weather) {
 		switch(weather) {
 			case "Thunderstorm": case "Fog": return "magenta";
-			case "Drizzle": case "Haze": case "Clouds": return "lightBlue";
+			case "Drizzle": case "Haze": case "Clouds": return "lightblue";
 			case "Clear": case "Squal": case "Snow": return "white";
 			case "Mist": case "Rain": return "blue";
 			default: return "white";

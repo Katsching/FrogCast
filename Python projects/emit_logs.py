@@ -43,7 +43,6 @@ connection = pika.BlockingConnection(
     pika.ConnectionParameters('192.168.178.30', 5672, '/', credentials))
 channel = connection.channel()
 
-
 channel.exchange_declare(exchange='sensor data', exchange_type='fanout')
 
 # fill attributes with arbitrary testing values

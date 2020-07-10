@@ -29,6 +29,10 @@ public class ReceiveLogs {
 	private static final String EXCHANGE_NAME = "sensor data";
 	private static final String LOCATION = "Backnang";
 	private static final String COUNTRYCODE = "DE";
+	
+	private double temperature;
+	private double humidity;
+	
 
 	public static void main(String[] argv) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();

@@ -12,7 +12,7 @@ magenta = (1, 0, 0.5)
 nocolor = (0, 0, 0)
 top = RGBLED(16, 20, 21)
 mid = RGBLED(6, 5, 0)
-bot = RGBLED(11, 9, 10)
+bot = RGBLED(4, 3, 2)
 last_color = "white"
 last_position = "top"
 
@@ -20,10 +20,10 @@ last_position = "top"
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
-channel.exchange_declare(exchange='sensor data', exchange_type='fanout')
+channel.exchange_declare(exchange='frog_data', exchange_type='fanout')
 result = channel.queue_declare(queue='', exclusive=True)
 queue_name = result.method.queue
-channel.queue_bind(exchange='sensor data', queue=queue_name)
+channel.queue_bind(exchange='frog_data', queue=queue_name)
 
 
 print(' [*] Waiting for logs. To exit press CTRL+C')

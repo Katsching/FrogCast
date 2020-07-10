@@ -23,7 +23,7 @@ import com.rabbitmq.client.Channel;
 
 public class EmitLog {
 
-	private static final String EXCHANGE_NAME = "sensor data";
+	private static final String EXCHANGE_NAME = "frog_data";
 
 	public static void main(String[] argv) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
@@ -41,8 +41,6 @@ public class EmitLog {
 			String weather = combinedForecastData.getMainWeather();
 			String position = weatherService.convertWeatherToPosition(weather);
 			String color = weatherService.convertWeatherToColor(weather);
-			double maxTemperature = combinedForecastData.getMaxTemperature();
-			double minTemperature = combinedForecastData.getMinTemperature();
 			
 			URL res = AI_Solver.class.getClassLoader().getResource("problem.pddl");
 			File file = Paths.get(res.toURI()).toFile();

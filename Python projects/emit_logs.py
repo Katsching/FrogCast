@@ -43,7 +43,7 @@ connection = pika.BlockingConnection(
     pika.ConnectionParameters('192.168.178.30', 5672, '/', credentials))
 channel = connection.channel()
 
-channel.exchange_declare(exchange='sensor data', exchange_type='fanout')
+channel.exchange_declare(exchange='sensor_data', exchange_type='fanout')
 
 # fill attributes with arbitrary testing values
 humidity, temperature = get_temperature_humidity_data()
@@ -54,6 +54,6 @@ message = build_message(temperature, humidity, rain)
 
 print(message)
 
-channel.basic_publish(exchange='sensor data', routing_key='', body=message)
+channel.basic_publish(exchange='sensor_data', routing_key='', body=message)
 print(" [x] Sent %r" % message)
 connection.close()

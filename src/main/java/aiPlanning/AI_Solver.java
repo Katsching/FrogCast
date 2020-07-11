@@ -117,6 +117,11 @@ public class AI_Solver {
 	public static List<String> getPlanAndUpdateProblem(String position, String color) throws IOException, URISyntaxException {
 		writeLine(30, "\t\t(LEDStatus " + position + ")");
 		writeLine(31, "\t\t(colorStatus " + color + ")");
+		//Dummy data for demo
+		
+		writeLine(10, "\t\t(LEDStatus " + "bot)");
+		writeLine(11, "\t\t(colorStatus " + "magenta)");
+		
 		
 		List<String> planList;
 		try {

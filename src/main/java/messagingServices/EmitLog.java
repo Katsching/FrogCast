@@ -65,7 +65,7 @@ public class EmitLog {
 					String message = createJsonObject(fromPosition, colorStatus, temperature , humidity).toString();
 					channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
 					System.out.println(" [x] Sent '" + message + "'");
-					String message2 = createJsonObject(toPosition, colorStatus, 5.0 , 60.0).toString();
+					String message2 = createJsonObject(toPosition, colorStatus, temperature , humidity).toString();
 					channel.basicPublish(EXCHANGE_NAME, "", null, message2.getBytes("UTF-8"));
 					System.out.println(" [x] Sent '" + message2 + "'");
 					ledStatus = toPosition;
@@ -74,10 +74,10 @@ public class EmitLog {
 					String[] planParts = plan.split(" ");
 					String fromColor = planParts[1];
 					String toColor = planParts[2].replace(")\"", "");
-					String message = createJsonObject(ledStatus, fromColor, 5.0 , 60.0).toString();
+					String message = createJsonObject(ledStatus, fromColor, temperature , humidity).toString();
 					channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
 					System.out.println(" [x] Sent '" + message + "'");
-					String message2 = createJsonObject(ledStatus, toColor, 5.0 , 60.0).toString();
+					String message2 = createJsonObject(ledStatus, toColor, temperature , humidity).toString();
 					channel.basicPublish(EXCHANGE_NAME, "", null, message2.getBytes("UTF-8"));
 					System.out.println(" [x] Sent '" + message2 + "'");
 					colorStatus = toColor;

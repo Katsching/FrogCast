@@ -15,9 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.tomcat.jni.Time;
-
-import com.google.api.services.calendar.model.CreateConferenceRequest;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.Channel;
 
@@ -25,7 +22,7 @@ public class EmitLog {
 
 	private static final String EXCHANGE_NAME = "frog_data";
 
-	public static void main(String[] argv) throws Exception {
+	public void sendMessageToRaspberry(double temperature, double humidity) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
 	    factory.setUsername("rasp");
 	    factory.setPassword("1234");
@@ -65,7 +62,7 @@ public class EmitLog {
 					String[] planParts = plan.split(" ");
 					String fromPosition = planParts[1];
 					String toPosition = planParts[2].replace(")\"", "");
-					String message = createJsonObject(fromPosition, colorStatus, 5.0 , 60.0).toString();
+					String message = createJsonObject(fromPosition, colorStatus, temperature , humidity).toString();
 					channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
 					System.out.println(" [x] Sent '" + message + "'");
 					String message2 = createJsonObject(toPosition, colorStatus, 5.0 , 60.0).toString();

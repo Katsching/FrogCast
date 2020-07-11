@@ -14,7 +14,6 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.Events;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.EventDateTime;
 
@@ -26,6 +25,10 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * This class holds all relevant methods to work with the Google Calendar API.
+ *
+ */
 public class CalendarQuickstart {
     private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -62,7 +65,17 @@ public class CalendarQuickstart {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    
+    /**
+     * Creates an event with the parameter data
+     * 
+     * @param summary
+     * @param location
+     * @param description
+     * @param date
+     * @param eventId
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
     public static void createEvent(String summary, String location, String description, String date, String eventId) throws GeneralSecurityException, IOException {
     	Calendar service = initiateTransport();
         
@@ -89,6 +102,17 @@ public class CalendarQuickstart {
          System.out.printf("Event created: %s\n", event.getHtmlLink());
     }
     
+    /**
+     * Updates the event with the parameter data
+     * 
+     * @param summary
+     * @param location
+     * @param description
+     * @param date
+     * @param eventId
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
     public static void updateEvent(String summary, String location, String description, String date, String eventId) throws GeneralSecurityException, IOException {
          Calendar service = initiateTransport();
 
@@ -120,24 +144,6 @@ public class CalendarQuickstart {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
         return service;
-    }
-    
-    
-    private void createEventTitle() {
-    	// format example: Rainy - 18�C
-    }
-    
-    private void createWeatherDescription() {
-    	//TODO
-    	// example: UV value
-    }
-    
-    private boolean eventIdExists(String eventId) throws GeneralSecurityException, IOException {
-    	Calendar service = initiateTransport();
-    	
-    	Events events = service.events().list("primary").setPageToken(null).execute();
-    	List<Event> items = events.getItems();
-    	return true;
     }
     
 }

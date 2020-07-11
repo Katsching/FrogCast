@@ -15,6 +15,7 @@ import weatherForecast.WeatherService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.TimeoutException;
@@ -26,13 +27,10 @@ import org.openweathermap.api.model.forecast.daily.DailyForecast;
 import com.google.gson.JsonObject;
 
 public class ReceiveLogs {
-	private static final String EXCHANGE_NAME = "sensor data";
+	private static final String EXCHANGE_NAME = "sensor_data";
 	private static final String LOCATION = "Backnang";
 	private static final String COUNTRYCODE = "DE";
-	
-	private double temperature;
-	private double humidity;
-	
+
 
 	public static void main(String[] argv) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
@@ -54,6 +52,8 @@ public class ReceiveLogs {
 			// convert the message from String to JSON object
 			JsonObject messageJson = JsonCreator.convertStringToJsonObject(messageString);
 
+			DecimalFormat df = new DecimalFormat("#.#");
+			
 			// extract values from message
 			double temperature = JsonCreator.getSpecificDoubleAttribute(messageJson, "temperature");
 			double humidity = JsonCreator.getSpecificDoubleAttribute(messageJson, "humidity");
@@ -72,6 +72,13 @@ public class ReceiveLogs {
 			System.out.println("City temperature: " + calendarData.getTemperature());
 
 			updateCalendar(temperature, humidity, rain, calendarData, combinedForecastData);
+			EmitLog emitLog = new EmitLog();
+			try {
+				emitLog.sendMessageToRaspberry(temperature, humidity);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		};
 

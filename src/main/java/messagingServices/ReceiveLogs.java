@@ -51,13 +51,14 @@ public class ReceiveLogs {
 
 			// convert the message from String to JSON object
 			JsonObject messageJson = JsonCreator.convertStringToJsonObject(messageString);
-
-			DecimalFormat df = new DecimalFormat("#.#");
-			
+			System.out.println("test");
 			// extract values from message
 			double temperature = JsonCreator.getSpecificDoubleAttribute(messageJson, "temperature");
 			double humidity = JsonCreator.getSpecificDoubleAttribute(messageJson, "humidity");
 			boolean rain = JsonCreator.getSpecificBooleanAttribute(messageJson, "rain");
+			
+			double roundedTemperature = (double)Math.round(temperature * 1d) / 1d;
+			double roundedHumidity = (double)Math.round(humidity * 1d) / 1d;
 
 			// print extracted values
 			System.out.println("Measured Temperature: " + temperature + "\nHumidity: " + humidity + "\nRain: " + rain);
@@ -71,10 +72,10 @@ public class ReceiveLogs {
 			System.out.println(calendarData.getMainWeather());
 			System.out.println("City temperature: " + calendarData.getTemperature());
 
-			updateCalendar(temperature, humidity, rain, calendarData, combinedForecastData);
+			updateCalendar(roundedTemperature, roundedHumidity, rain, calendarData, combinedForecastData);
 			EmitLog emitLog = new EmitLog();
 			try {
-				emitLog.sendMessageToRaspberry(temperature, humidity);
+				emitLog.sendMessageToRaspberry(roundedTemperature, roundedHumidity);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

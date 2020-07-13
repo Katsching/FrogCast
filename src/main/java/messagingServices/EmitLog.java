@@ -19,6 +19,9 @@ import org.openweathermap.api.model.currentweather.CurrentWeather;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.Channel;
 
+/**
+ * Send messages via RabbitMQ to a topic with the name frog_data
+ */
 public class EmitLog {
 
 	private static final String EXCHANGE_NAME = "frog_data";
@@ -26,6 +29,13 @@ public class EmitLog {
 	private static final String countryCode = "DE";
 
 
+	/**
+	 * Sends a message to the Raspberry with the position and the color of the smart weather frog
+	 * 
+	 * @param temperature
+	 * @param humidity
+	 * @throws Exception
+	 */
 	public static void sendMessageToRaspberry(double temperature, double humidity) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
 	    factory.setUsername("rasp");
@@ -92,7 +102,15 @@ public class EmitLog {
 		}
 	}
 	
-
+	/**
+	 * Converts the parameters into a valid JSON Object
+	 * 
+	 * @param position
+	 * @param color
+	 * @param temperature
+	 * @param humidity
+	 * @return
+	 */
 	private static JsonObject createJsonObject(String position, String color, double temperature, double humidity) {
 		JsonObject outputActuators = new JsonObject();
 		outputActuators.addProperty("position", position);

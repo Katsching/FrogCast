@@ -26,12 +26,23 @@ import org.openweathermap.api.model.forecast.daily.DailyForecast;
 
 import com.google.gson.JsonObject;
 
+/**
+ * 
+ * Main class of the system. Waits for messages from the sensors, processes the data and send to the smart weather frog 
+ *
+ */
 public class ReceiveLogs {
 	private static final String EXCHANGE_NAME = "sensor_data";
 	private static final String LOCATION = "Backnang";
 	private static final String COUNTRYCODE = "DE";
 
 
+	/**
+	 * Main method of the system
+	 * 
+	 * @param argv
+	 * @throws Exception
+	 */
 	public static void main(String[] argv) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
 		factory.setHost("localhost");
@@ -88,6 +99,15 @@ public class ReceiveLogs {
 
 	}
 
+	/**
+	 * Method to update 2 all-day entries in the Google Calendar of the user
+	 * 
+	 * @param temperature
+	 * @param humidity
+	 * @param rain
+	 * @param calenderCurrentWeatherData
+	 * @param combinedForecastData
+	 */
 	private static void updateCalendar(double temperature, double humidity, boolean rain,
 			CalendarWeatherData calenderCurrentWeatherData, CombinedForecastData combinedForecastData) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");

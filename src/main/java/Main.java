@@ -12,19 +12,19 @@ import weatherForecast.WeatherService;
 public class Main {
 
     public static void main(String[] args) {
-    	WeatherService weatherServices = new WeatherService();
-    	weatherServices.getWeatherFromCity("Backnang", "DE");
-    	
-    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    	
-    	// get today's date
-    	Calendar todaysDate = Calendar.getInstance();
-        String todaysDateString = df.format(todaysDate.getTime());
-    	
-    	// get tomorrow's date
-    	Calendar tomorrowsDate = Calendar.getInstance();
-        tomorrowsDate.add(Calendar.DAY_OF_MONTH, 1);
-        String tomorrowsDateString = df.format(tomorrowsDate.getTime());
+//    	WeatherService weatherServices = new WeatherService();
+//    	weatherServices.getWeatherFromCity("Backnang", "DE");
+//    	
+//    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+//    	
+//    	// get today's date
+//    	Calendar todaysDate = Calendar.getInstance();
+//        String todaysDateString = df.format(todaysDate.getTime());
+//    	
+//    	// get tomorrow's date
+//    	Calendar tomorrowsDate = Calendar.getInstance();
+//        tomorrowsDate.add(Calendar.DAY_OF_MONTH, 1);
+//        String tomorrowsDateString = df.format(tomorrowsDate.getTime());
     	
 //    	Date currentDateObj = new Date();
 //       	

@@ -30,11 +30,22 @@ import com.google.gson.JsonObject;
 
 import DailyWeatherJson.FullOneApiCall;
 
+/**
+ * This class includes all methods which are related to the weather
+ */
 public class WeatherService {
 	private static final String APIKEY = "e030cee405d4b9b32704de57c13778d2";
+	// Backnang weather
 	private static final double LATITUDE = 48.94744;
 	private static final double LONGITUDE = 9.43718;
 
+	/**
+	 * Get current weather from the city
+	 * 
+	 * @param city
+	 * @param countryCode
+	 * @return
+	 */
 	public CurrentWeather getWeatherFromCity(String city, String countryCode) {
 		DataWeatherClient client = new UrlConnectionDataWeatherClient("e030cee405d4b9b32704de57c13778d2");
 		CurrentWeatherOneLocationQuery currentWeatherOneLocationQuery = QueryBuilderPicker.pick().currentWeather() // get
@@ -50,20 +61,16 @@ public class WeatherService {
 				.build();
 		CurrentWeather currentWeather = client.getCurrentWeather(currentWeatherOneLocationQuery);
 		String weatherData = client.getWeatherData(currentWeatherOneLocationQuery);
-//		System.out.println(weatherData);
-//		System.out.println(currentWeather.getWeather());
-//     client.getForecastInformation(currentWeatherOneLocationQuery);
-
-//		System.out.println(client.getWeatherData(currentWeatherOneLocationQuery));
-//		System.out.println(currentWeather.getClouds());
-//		System.out.println(prettyPrint(currentWeather));
-
-		// CombinedWeatherData combinedWeatherData = new
-		// CombinedWeatherData(currentWeather.getWeather(), currentWeather);
 		return currentWeather;
 
 	}
 
+	/**
+	 * Get the next day weather forecast and combines the information
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
 	public CombinedForecastData getWeatherForecastFromCity() throws IOException {
 	
 		OpenWeatherApiParser openWeatherApiParser = new OpenWeatherApiParser();
@@ -80,30 +87,14 @@ public class WeatherService {
 				averageHumidity, weatherDescription, mainWeather);
 		
 		return combinedForecastData;
-
-//		System.out.println(maximalTemperature);
-//		System.out.println(minimalTemperature);
-//		System.out.println(humidityList);
-//		System.out.println(averageHumidity);
-//		System.out.println("Will it rain: " + willItRainTomorrow);
-//		System.out.println(rainTimeMap);
-
 	}
 
-	public double findMinMaxTemperature() {
-		int hour = LocalDateTime.now().getHour();
 
-		double timeLeftTill24 = 24 - hour;
-		double countTill24 = Math.ceil(timeLeftTill24 / 3);
-
-		System.out.println(hour);
-		System.out.println(timeLeftTill24);
-		System.out.println(countTill24);
-
-		return countTill24;
-
-	}
-
+	/**
+	 * Refactors the weather into a pretty print
+	 * @param currentWeather
+	 * @return
+	 */
 	private static String prettyPrint(CurrentWeather currentWeather) {
 		return String.format("City: " + currentWeather.getCityName() + ", country: "
 				+ currentWeather.getSystemParameters().getCountry() + ", temperature: "
@@ -112,27 +103,14 @@ public class WeatherService {
 				+ currentWeather.getMainParameters().getPressure());
 	}
 
-//	private JsonObject addWeatherDataToJson(double rain, double cloud) {
-//
-//		String position = convertWeatherToPosition();
-//		String color = convertWeatherToColor();
-//
-//		JsonObject json = new JsonObject();
-//		json.addProperty("position", position);
-//		json.addProperty("color", color);
-//
-//		return json;
-//	}
 
-	public String convertWeatherToPosition(String weather) {
-//		String position = switch(weather) {
-//			case "Thunderstorm", "Drizzle", "Rain", "Snow" -> "bot";
-//			case "Haze", "Mist", "Fog", "Squal" -> "mid";
-//			case "Clear", "Clouds" -> "top";
-//			default -> "mid";
-//		};
-//		return position;
-		
+
+	/**
+	 * Converts the main weather into a position for the weather frog
+	 * @param weather
+	 * @return
+	 */
+	public String convertWeatherToPosition(String weather) {	
 		switch(weather) {
 			case "Thunderstorm": case "Drizzle": case "Rain": case "Snow": return "bot";
 			case "Haze": case "Mist": case "Fog": case "Squal": return "mid";
@@ -141,6 +119,11 @@ public class WeatherService {
 		}
 	}
 
+	/**
+	 * Converts the main weather into a color for the weather frog
+	 * @param weather
+	 * @return
+	 */
 	public String convertWeatherToColor(String weather) {
 		switch(weather) {
 			case "Thunderstorm": case "Fog": return "magenta";
@@ -151,6 +134,12 @@ public class WeatherService {
 		}
 	}
 
+	/**
+	 * Method to create today's all-day entry for Google Calendar
+	 * 
+	 * @param currentWeather
+	 * @return
+	 */
 	public CalendarWeatherData createCalendarDataCurrent(CurrentWeather currentWeather) {
 
 		List<Weather> weatherData = currentWeather.getWeather();
@@ -170,6 +159,12 @@ public class WeatherService {
 		return calendarData;
 	}
 
+	/**
+	 * Method to create tomorrow's all-day entry for Google Calendar
+	 * 
+	 * @param dailyForecast
+	 * @return
+	 */
 	public CalendarWeatherData createCalendarDataForecast(DailyForecast dailyForecast) {
 		List<Weather> weatherData = dailyForecast.getWeather();
 		Weather weatherForecast = weatherData.get(0);

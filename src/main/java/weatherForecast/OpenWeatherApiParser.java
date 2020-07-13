@@ -15,8 +15,21 @@ import DailyWeatherJson.Daily;
 import DailyWeatherJson.FullOneApiCall;
 import communication.JsonCreator;
 
+/**
+ * Class to parse the OpenWeatherMap API for the One Call API
+ * 
+ */
 public class OpenWeatherApiParser {
 
+	/**
+	 * sends a GET request to receive the One Call API data from the OpenWeatherMap site and parses it for relevant data.
+	 * 
+	 * @param latitude
+	 * @param longitude
+	 * @param apiKey
+	 * @return
+	 * @throws IOException
+	 */
 	public static FullOneApiCall getResponseFromWebsite(double latitude, double longitude, String apiKey) throws IOException {
 		JsonObject messageJson = null; // url
 		FullOneApiCall fullOneApiCall = new FullOneApiCall();
@@ -45,6 +58,15 @@ public class OpenWeatherApiParser {
 		return fullOneApiCall;
 	}
 
+	/**
+	 * Creates the URL to use for the OpenWeatherMap API
+	 * 
+	 * @param latitude
+	 * @param longitude
+	 * @param apiKey
+	 * @return
+	 * @throws MalformedURLException
+	 */
 	private static URL combineURL(double latitude, double longitude, String apiKey) throws MalformedURLException {
 
 		String urlFirstPart = "https://api.openweathermap.org/data/2.5/onecall?lat=";

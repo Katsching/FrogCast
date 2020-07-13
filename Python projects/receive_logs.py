@@ -3,6 +3,9 @@ import pika
 import json
 from gpiozero import LED, RGBLED
 import time
+from luma.led_matrix.device import max7219
+from luma.core.interface.serial import spi, noop
+from luma.core.virtual import sevensegment
 
 
 white = (1, 1, 1)
@@ -17,6 +20,8 @@ last_color = "white"
 last_position = "top"
 
 
+
+
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
@@ -27,6 +32,13 @@ channel.queue_bind(exchange='frog_data', queue=queue_name)
 
 
 print(' [*] Waiting for logs. To exit press CTRL+C')
+
+
+def main(temp, hum):
+    serial = spi(port=0, device=0, gpio=noop())
+    device = max7219(serial, cascaded=1)
+    seg = sevensegment(device)
+    seg.text = str(temp) + ' ' + str(hum)
 
 
 def callback(ch, method, properties, body):
@@ -43,15 +55,16 @@ def callback(ch, method, properties, body):
         print("received weather information")
         position = message_data['position']
         color = message_data['color']
+        temperature = message_data['temperature']
+        humidity = message_data['humidity']
 
         last_color = color
         last_position = position
 
-        temperature = message_data['temperature']
-        humidity = message_data['humidity']
         eval(position).color = eval(color)
         time.sleep(1)
         eval(position).color = (0, 0, 0)
+        main(temperature, humidity)
 
 
 channel.basic_consume(

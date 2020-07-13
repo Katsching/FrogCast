@@ -2,7 +2,6 @@ package messagingServices;
 import com.rabbitmq.client.ConnectionFactory;
 
 import aiPlanning.AI_Solver;
-import weatherForecast.CombinedForecastData;
 import weatherForecast.WeatherService;
 
 import com.rabbitmq.client.Connection;
@@ -15,14 +14,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.openweathermap.api.model.currentweather.CurrentWeather;
+
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.Channel;
 
 public class EmitLog {
 
 	private static final String EXCHANGE_NAME = "frog_data";
+	private static final String city = "Backnang";
+	private static final String countryCode = "DE";
 
-	public void sendMessageToRaspberry(double temperature, double humidity) throws Exception {
+
+	public static void sendMessageToRaspberry(double temperature, double humidity) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
 	    factory.setUsername("rasp");
 	    factory.setPassword("1234");
@@ -34,8 +38,8 @@ public class EmitLog {
 
 //			String message = argv.length < 1 ? "info: Hello World!" : String.join(" ", argv);
 			WeatherService weatherService = new WeatherService();
-			CombinedForecastData combinedForecastData = weatherService.getWeatherForecastFromCity();
-			String weather = combinedForecastData.getMainWeather();
+			CurrentWeather currentWeather = weatherService.getWeatherFromCity(city, countryCode);
+			String weather = currentWeather.getWeather().get(0).getMain();
 			String position = weatherService.convertWeatherToPosition(weather);
 			String color = weatherService.convertWeatherToColor(weather);
 			

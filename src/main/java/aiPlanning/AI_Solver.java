@@ -18,6 +18,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.tomcat.jni.Time;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -35,7 +36,7 @@ public class AI_Solver {
 	 */
 	public static void main(String[] args){
 		try {
-			getPlanAndUpdateProblem("bot", "blue");
+			getPlanAndUpdateProblem("top", "white");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -119,9 +120,9 @@ public class AI_Solver {
 		writeLine(31, "\t\t(colorStatus " + color + ")");
 		//Dummy data for demo
 		
-		writeLine(10, "\t\t(LEDStatus " + "bot)");
-		writeLine(11, "\t\t(colorStatus " + "magenta)");
-		
+//		writeLine(10, "\t\t(LEDStatus " + "bot)");
+//		writeLine(11, "\t\t(colorStatus " + "magenta)");
+//		
 		
 		List<String> planList;
 		try {

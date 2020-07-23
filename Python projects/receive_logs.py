@@ -34,11 +34,29 @@ channel.queue_bind(exchange='frog_data', queue=queue_name)
 print(' [*] Waiting for logs. To exit press CTRL+C')
 
 
+def numbers_to_string(temperature, humidity):
+    if temperature < 0:
+        string = "-"
+    else:
+        string = " "
+    
+    if abs(temperature) < 10:
+        string += " "
+        
+    string += str(abs(temperature))
+        
+    if humidity < 100:
+        string += " "
+        
+    string += str(humidity)
+
+    return string
+
 def main(temp, hum):
     serial = spi(port=0, device=0, gpio=noop())
     device = max7219(serial, cascaded=1)
     seg = sevensegment(device)
-    seg.text = str(temp) + ' ' + str(hum)
+    seg.text = numbers_to_string(temp, hum)
 
 
 def callback(ch, method, properties, body):
@@ -52,9 +70,9 @@ def callback(ch, method, properties, body):
         time.sleep(20)
         eval(last_position).color = (0, 0, 0)
     else:
-        print("received weather information")
         position = message_data['position']
         color = message_data['color']
+        print("received weather information: " + position + ", " + color)
         temperature = message_data['temperature']
         humidity = message_data['humidity']
 
